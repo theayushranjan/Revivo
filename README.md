@@ -89,12 +89,6 @@ http://localhost:3000
 
 ---
 
-## 🌍 Live Demo
-
-🚀 *(Add deployed link here – e.g., Vercel)*
-
----
-
 ## 📊 Future Scope
 
 * 🤖 AI-based waste classification
