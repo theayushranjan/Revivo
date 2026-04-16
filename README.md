@@ -28,7 +28,7 @@ E-Waste Revivo is a web-based platform designed to promote responsible electroni
 
 ## 🖼️ Screenshots
 
-![Uploading Screenshot 2026-04-17 023715.png…]()
+<img width="1365" height="767" alt="Screenshot 2026-04-17 023715" src="https://github.com/user-attachments/assets/63c2393d-0be1-4131-866f-2c462fadfb5c" />
 
 <img width="1365" height="767" alt="Screenshot 2026-04-17 023809" src="https://github.com/user-attachments/assets/5ae96f8d-0d18-4bb0-8345-14028e8c0913" />
 <img width="1365" height="767" alt="Screenshot 2026-04-17 023837" src="https://github.com/user-attachments/assets/11b84b37-4e07-464e-bead-2e898c68b2c7" />
