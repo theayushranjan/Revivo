@@ -1,0 +1,167 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  password      String
+  ePoints       Int       @default(0)
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  ewasteItems    EwasteItem[]
+  pickups        Pickup[]
+  rewards        Reward[]
+  vouchers       VoucherRedemption[]
+  transactions   Transaction[]
+
+  @@map("users")
+}
+
+model EwasteItem {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  category    String   // TV, AC, Fridge, Phone, Charger, etc.
+  brand       String?
+  model       String?
+  age         Int?     // in years
+  condition   String   // Working, Not Working, Damaged
+  description String?
+  images      String?  // JSON array of image URLs
+  status      String   @default("pending") // pending, quoted, scheduled, picked_up, assessed, recycled
+  estimatedPoints Int?
+  finalPoints Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pickup      Pickup?
+  assessment  Assessment?
+
+  @@map("ewaste_items")
+}
+
+model Pickup {
+  id            String    @id @default(cuid())
+  userId        String
+  ewasteItemId  String    @unique
+  scheduledDate DateTime
+  scheduledTime String
+  status        String    @default("scheduled") // scheduled, completed, cancelled
+  pickupAddress String
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ewasteItem   EwasteItem  @relation(fields: [ewasteItemId], references: [id], onDelete: Cascade)
+
+  @@map("pickups")
+}
+
+model Assessment {
+  id            String   @id @default(cuid())
+  ewasteItemId  String   @unique
+  engineerId    String?
+  assessmentDate DateTime @default(now())
+  condition     String   // Good, Fair, Poor, Beyond Repair
+  reusableParts String? // JSON array of reusable parts
+  finalPoints   Int
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  ewasteItem    EwasteItem @relation(fields: [ewasteItemId], references: [id], onDelete: Cascade)
+
+  @@map("assessments")
+}
+
+model Reward {
+  id          String   @id @default(cuid())
+  userId      String
+  points      Int
+  type        String   // earned, redeemed
+  description String
+  referenceId String?  // ewasteItemId or voucherRedemptionId
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("rewards")
+}
+
+model Voucher {
+  id          String   @id @default(cuid())
+  name        String
+  provider    String   // Amazon, Flipkart, etc.
+  description String
+  points      Int      // points required
+  value       Int      // monetary value in rupees
+  isActive    Boolean  @default(true)
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  redemptions VoucherRedemption[]
+
+  @@map("vouchers")
+}
+
+model VoucherRedemption {
+  id          String   @id @default(cuid())
+  userId      String
+  voucherId   String
+  pointsUsed  Int
+  code        String   @unique
+  isUsed      Boolean  @default(false)
+  usedAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voucher     Voucher @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+
+  @@map("voucher_redemptions")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // credit, debit
+  amount      Int
+  description String
+  referenceId String?  // ewasteItemId, voucherRedemptionId, etc.
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
